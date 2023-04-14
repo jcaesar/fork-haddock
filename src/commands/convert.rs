@@ -54,7 +54,12 @@ enum Format {
 }
 
 pub(crate) fn run(args: Args, config: &Config) -> Result<()> {
-    let file = compose::parse(config, args.no_interpolate)?;
+    let file = compose::parse(
+        &config.project_name,
+        &config.files,
+        &config.profiles,
+        args.no_interpolate,
+    )?;
 
     if !args.quiet {
         if args.services {

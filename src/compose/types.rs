@@ -19,7 +19,7 @@ use serde_with::{
 };
 use serde_yaml::Value;
 
-use crate::utils::{DisplayFromAny, STYLED_WARNING};
+use crate::{utils::DisplayFromAny, STYLED_WARNING};
 
 #[skip_serializing_none]
 #[serde_as]
@@ -27,25 +27,25 @@ use crate::utils::{DisplayFromAny, STYLED_WARNING};
     IndexMap => #[serde(skip_serializing_if = "IndexMap::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub(crate) struct Compose {
-    pub(crate) name: Option<String>,
-    pub(crate) version: Option<String>,
+pub struct Compose {
+    pub name: Option<String>,
+    pub version: Option<String>,
     #[serde_with(skip_apply)]
     #[serde(default)]
-    pub(crate) services: IndexMap<String, Service>,
+    pub services: IndexMap<String, Service>,
     #[serde_as(as = "IndexMap<_, DefaultOnNull>")]
-    pub(crate) networks: IndexMap<String, Network>,
+    pub networks: IndexMap<String, Network>,
     #[serde_as(as = "IndexMap<_, DefaultOnNull>")]
-    pub(crate) volumes: IndexMap<String, Volume>,
-    pub(crate) secrets: IndexMap<String, Secret>,
+    pub volumes: IndexMap<String, Volume>,
+    pub secrets: IndexMap<String, Secret>,
 }
 
 impl Compose {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self::default()
     }
 
-    pub(crate) fn merge(&mut self, other: Self) {
+    pub fn merge(&mut self, other: Self) {
         if other.version.is_some() {
             self.version = other.version;
         }
@@ -75,108 +75,108 @@ impl Compose {
     Vec => #[serde(skip_serializing_if = "Vec::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Service {
-    pub(crate) blkio_config: Option<BlkioConfig>,
-    pub(crate) cap_add: Vec<String>,
-    pub(crate) cap_drop: Vec<String>,
-    pub(crate) cgroup_parent: Option<String>,
+pub struct Service {
+    pub blkio_config: Option<BlkioConfig>,
+    pub cap_add: Vec<String>,
+    pub cap_drop: Vec<String>,
+    pub cgroup_parent: Option<String>,
     #[serde_as(as = "PickFirst<(_, CommandOrString)>")]
-    pub(crate) command: Vec<String>,
-    pub(crate) container_name: Option<String>,
+    pub command: Vec<String>,
+    pub container_name: Option<String>,
     #[serde_as(as = "Option<PickFirst<(DurationMicroSeconds, DurationWithSuffix)>>")]
-    pub(crate) cpu_period: Option<Duration>,
+    pub cpu_period: Option<Duration>,
     #[serde_as(as = "Option<PickFirst<(DurationMicroSeconds, DurationWithSuffix)>>")]
-    pub(crate) cpu_quota: Option<Duration>,
+    pub cpu_quota: Option<Duration>,
     #[serde_as(as = "Option<PickFirst<(DurationMicroSeconds, DurationWithSuffix)>>")]
-    pub(crate) cpu_rt_period: Option<Duration>,
+    pub cpu_rt_period: Option<Duration>,
     #[serde_as(as = "Option<PickFirst<(DurationMicroSeconds, DurationWithSuffix)>>")]
-    pub(crate) cpu_rt_runtime: Option<Duration>,
-    pub(crate) cpu_shares: Option<i32>,
-    pub(crate) cpus: Option<f64>,
-    pub(crate) cpuset: Option<String>,
+    pub cpu_rt_runtime: Option<Duration>,
+    pub cpu_shares: Option<i32>,
+    pub cpus: Option<f64>,
+    pub cpuset: Option<String>,
     #[serde_as(as = "PickFirst<(_, IndexMap<DisplayFromAny, _>, DependsOnVec)>")]
-    pub(crate) depends_on: IndexMap<String, Dependency>,
-    pub(crate) deploy: Option<DeployConfig>,
-    pub(crate) device_cgroup_rules: Vec<String>,
+    pub depends_on: IndexMap<String, Dependency>,
+    pub deploy: Option<DeployConfig>,
+    pub device_cgroup_rules: Vec<String>,
     #[serde_as(as = "SetLastValueWins<DeviceOrString>")]
-    pub(crate) devices: IndexSet<Device>,
+    pub devices: IndexSet<Device>,
     #[serde_as(as = "OneOrMany<_, PreferMany>")]
-    pub(crate) dns: Vec<String>,
-    pub(crate) dns_opt: Vec<String>,
+    pub dns: Vec<String>,
+    pub dns_opt: Vec<String>,
     #[serde_as(as = "OneOrMany<_, PreferMany>")]
-    pub(crate) dns_search: Vec<String>,
+    pub dns_search: Vec<String>,
     #[serde_as(as = "PickFirst<(_, CommandOrString)>")]
-    pub(crate) entrypoint: Vec<String>,
+    pub entrypoint: Vec<String>,
     #[serde_as(as = "OneOrMany<AbsPathBuf, PreferMany>")]
-    pub(crate) env_file: Vec<PathBuf>,
+    pub env_file: Vec<PathBuf>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, Option<DisplayFromAny>>, MappingWithEqualsNull)>"
     )]
-    pub(crate) environment: IndexMap<String, Option<String>>,
-    pub(crate) expose: Vec<String>,
+    pub environment: IndexMap<String, Option<String>>,
+    pub expose: Vec<String>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, DisplayFromAny>, MappingWithColonEmpty)>"
     )]
-    pub(crate) extra_hosts: IndexMap<String, String>,
-    pub(crate) group_add: Vec<String>,
-    pub(crate) healthcheck: Option<Healthcheck>,
-    pub(crate) hostname: Option<String>,
-    pub(crate) image: Option<String>,
-    pub(crate) init: Option<bool>,
-    pub(crate) ipc: Option<String>,
+    pub extra_hosts: IndexMap<String, String>,
+    pub group_add: Vec<String>,
+    pub healthcheck: Option<Healthcheck>,
+    pub hostname: Option<String>,
+    pub image: Option<String>,
+    pub init: Option<bool>,
+    pub ipc: Option<String>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, DisplayFromAny>, MappingWithEqualsEmpty)>"
     )]
-    pub(crate) labels: IndexMap<String, String>,
-    pub(crate) logging: Option<Logging>,
-    pub(crate) mac_address: Option<String>,
-    pub(crate) mem_limit: Option<Byte>,
-    pub(crate) mem_reservation: Option<Byte>,
-    pub(crate) mem_swappiness: Option<i32>,
-    pub(crate) memswap_limit: Option<SwapLimit>,
+    pub labels: IndexMap<String, String>,
+    pub logging: Option<Logging>,
+    pub mac_address: Option<String>,
+    pub mem_limit: Option<Byte>,
+    pub mem_reservation: Option<Byte>,
+    pub mem_swappiness: Option<i32>,
+    pub memswap_limit: Option<SwapLimit>,
     #[serde_as(as = "PickFirst<(_, IndexMap<DisplayFromAny, _>, NetworksVec)>")]
     #[serde_with(skip_apply)]
     #[serde(default = "default_service_networks")]
-    pub(crate) networks: IndexMap<String, Option<ServiceNetwork>>,
-    pub(crate) network_mode: Option<String>,
-    pub(crate) oom_kill_disable: Option<bool>,
-    pub(crate) oom_score_adj: Option<i32>,
-    pub(crate) pid: Option<String>,
-    pub(crate) pids_limit: Option<i32>,
-    pub(crate) platform: Option<String>,
+    pub networks: IndexMap<String, Option<ServiceNetwork>>,
+    pub network_mode: Option<String>,
+    pub oom_kill_disable: Option<bool>,
+    pub oom_score_adj: Option<i32>,
+    pub pid: Option<String>,
+    pub pids_limit: Option<i32>,
+    pub platform: Option<String>,
     #[serde_as(as = "Vec<PickFirst<(_, PortOrString, PortOrU16)>>")]
-    pub(crate) ports: Vec<Port>,
-    pub(crate) privileged: Option<bool>,
-    pub(crate) profiles: Vec<String>,
-    pub(crate) pull_policy: Option<PullPolicy>,
-    pub(crate) read_only: Option<bool>,
-    pub(crate) restart: Option<RestartPolicy>,
-    pub(crate) runtime: Option<String>,
-    pub(crate) scale: Option<u32>,
+    pub ports: Vec<Port>,
+    pub privileged: Option<bool>,
+    pub profiles: Vec<String>,
+    pub pull_policy: Option<PullPolicy>,
+    pub read_only: Option<bool>,
+    pub restart: Option<RestartPolicy>,
+    pub runtime: Option<String>,
+    pub scale: Option<u32>,
     #[serde_as(as = "SetLastValueWins<PickFirst<(_, FileReferenceOrString)>>")]
-    pub(crate) secrets: IndexSet<FileReference>,
+    pub secrets: IndexSet<FileReference>,
     #[serde_as(as = "SecurityOptVec")]
-    pub(crate) security_opt: Vec<(String, Option<String>)>,
-    pub(crate) shm_size: Option<Byte>,
-    pub(crate) stdin_open: Option<bool>,
+    pub security_opt: Vec<(String, Option<String>)>,
+    pub shm_size: Option<Byte>,
+    pub stdin_open: Option<bool>,
     #[serde_as(as = "Option<DurationWithSuffix>")]
-    pub(crate) stop_grace_period: Option<Duration>,
-    pub(crate) stop_signal: Option<String>,
-    pub(crate) storage_opt: IndexMap<String, String>,
+    pub stop_grace_period: Option<Duration>,
+    pub stop_signal: Option<String>,
+    pub storage_opt: IndexMap<String, String>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, DisplayFromAny>, MappingWithEqualsNoNull)>"
     )]
-    pub(crate) sysctls: IndexMap<String, String>,
+    pub sysctls: IndexMap<String, String>,
     #[serde_as(as = "OneOrMany<_, PreferMany>")]
-    pub(crate) tmpfs: Vec<PathBuf>,
-    pub(crate) tty: Option<bool>,
-    pub(crate) ulimits: IndexMap<String, ResourceLimit>,
-    pub(crate) user: Option<String>,
-    pub(crate) userns_mode: Option<String>,
+    pub tmpfs: Vec<PathBuf>,
+    pub tty: Option<bool>,
+    pub ulimits: IndexMap<String, ResourceLimit>,
+    pub user: Option<String>,
+    pub userns_mode: Option<String>,
     #[serde_as(as = "SetLastValueWins<PickFirst<(_, ServiceVolumeOrString)>>")]
-    pub(crate) volumes: IndexSet<ServiceVolume>,
-    pub(crate) volumes_from: Vec<String>,
-    pub(crate) working_dir: Option<PathBuf>,
+    pub volumes: IndexSet<ServiceVolume>,
+    pub volumes_from: Vec<String>,
+    pub working_dir: Option<PathBuf>,
 }
 
 fn default_service_networks() -> IndexMap<String, Option<ServiceNetwork>> {
@@ -207,14 +207,14 @@ fn merge(base: &mut Value, other: Value) {
 }
 
 impl Service {
-    pub(crate) fn merge(&mut self, other: &Self) {
+    pub fn merge(&mut self, other: &Self) {
         let mut value = serde_yaml::to_value(&self).unwrap();
         merge(&mut value, serde_yaml::to_value(other).unwrap());
 
         *self = serde_yaml::from_value(value).unwrap();
     }
 
-    pub(crate) fn to_args(&self) -> (Vec<String>, Vec<String>) {
+    pub fn to_args(&self) -> (Vec<String>, Vec<String>) {
         let mut global_args = Vec::new();
         let mut args = Vec::new();
 
@@ -622,21 +622,21 @@ impl Service {
     Vec => #[serde(skip_serializing_if = "Vec::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct BlkioConfig {
-    pub(crate) weight: Option<u16>,
-    pub(crate) weight_device: Vec<WeightDevice>,
-    pub(crate) device_read_bps: Vec<ThrottleDevice>,
-    pub(crate) device_write_bps: Vec<ThrottleDevice>,
-    pub(crate) device_read_iops: Vec<ThrottleDevice>,
-    pub(crate) device_write_iops: Vec<ThrottleDevice>,
+pub struct BlkioConfig {
+    pub weight: Option<u16>,
+    pub weight_device: Vec<WeightDevice>,
+    pub device_read_bps: Vec<ThrottleDevice>,
+    pub device_write_bps: Vec<ThrottleDevice>,
+    pub device_read_iops: Vec<ThrottleDevice>,
+    pub device_write_iops: Vec<ThrottleDevice>,
 }
 
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct WeightDevice {
+pub struct WeightDevice {
     #[serde_as(as = "AbsPathBuf")]
-    pub(crate) path: PathBuf,
-    pub(crate) weight: u16,
+    pub path: PathBuf,
+    pub weight: u16,
 }
 
 impl Display for WeightDevice {
@@ -647,10 +647,10 @@ impl Display for WeightDevice {
 
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct ThrottleDevice {
+pub struct ThrottleDevice {
     #[serde_as(as = "AbsPathBuf")]
-    pub(crate) path: PathBuf,
-    pub(crate) rate: Byte,
+    pub path: PathBuf,
+    pub rate: Byte,
 }
 
 impl Display for ThrottleDevice {
@@ -660,12 +660,12 @@ impl Display for ThrottleDevice {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Dependency {
-    pub(crate) condition: Condition,
+pub struct Dependency {
+    pub condition: Condition,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
-pub(crate) enum Condition {
+pub enum Condition {
     #[serde(rename = "service_started")]
     Started,
     #[serde(rename = "service_healthy")]
@@ -676,36 +676,36 @@ pub(crate) enum Condition {
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct DeployConfig {
-    pub(crate) replicas: Option<u32>,
-    pub(crate) resources: Option<Resources>,
+pub struct DeployConfig {
+    pub replicas: Option<u32>,
+    pub resources: Option<Resources>,
 }
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Resources {
-    pub(crate) limits: Option<Resource>,
-    pub(crate) reservations: Option<Resource>,
+pub struct Resources {
+    pub limits: Option<Resource>,
+    pub reservations: Option<Resource>,
 }
 
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Resource {
+pub struct Resource {
     #[serde_as(as = "Option<PickFirst<(_, DisplayFromStr)>>")]
-    pub(crate) cpus: Option<f64>,
-    pub(crate) memory: Option<Byte>,
-    pub(crate) pids: Option<i32>,
+    pub cpus: Option<f64>,
+    pub memory: Option<Byte>,
+    pub pids: Option<i32>,
 }
 
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Device {
+pub struct Device {
     #[serde_as(as = "AbsPathBuf")]
-    pub(crate) source: PathBuf,
-    pub(crate) target: Option<PathBuf>,
-    pub(crate) permissions: Option<String>,
+    pub source: PathBuf,
+    pub target: Option<PathBuf>,
+    pub permissions: Option<String>,
 }
 
 impl PartialEq for Device {
@@ -744,17 +744,17 @@ impl Display for Device {
     Vec => #[serde(skip_serializing_if = "Vec::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Healthcheck {
+pub struct Healthcheck {
     #[serde_as(as = "PickFirst<(_, CommandOrString)>")]
-    pub(crate) test: Vec<String>,
+    pub test: Vec<String>,
     #[serde_as(as = "Option<DurationWithSuffix>")]
-    pub(crate) interval: Option<Duration>,
+    pub interval: Option<Duration>,
     #[serde_as(as = "Option<DurationWithSuffix>")]
-    pub(crate) timeout: Option<Duration>,
+    pub timeout: Option<Duration>,
     #[serde_as(as = "Option<DurationWithSuffix>")]
-    pub(crate) start_period: Option<Duration>,
-    pub(crate) retries: Option<u32>,
-    pub(crate) disable: Option<bool>,
+    pub start_period: Option<Duration>,
+    pub retries: Option<u32>,
+    pub disable: Option<bool>,
 }
 
 #[skip_serializing_none]
@@ -762,14 +762,14 @@ pub(crate) struct Healthcheck {
     IndexMap => #[serde(skip_serializing_if = "IndexMap::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct Logging {
-    pub(crate) driver: Option<String>,
-    pub(crate) options: IndexMap<String, String>,
+pub struct Logging {
+    pub driver: Option<String>,
+    pub options: IndexMap<String, String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
-pub(crate) enum SwapLimit {
+pub enum SwapLimit {
     Limited(Byte),
     Unlimited(i8),
 }
@@ -789,13 +789,13 @@ impl Display for SwapLimit {
     Vec => #[serde(skip_serializing_if = "Vec::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct ServiceNetwork {
+pub struct ServiceNetwork {
     #[serde_as(as = "Vec<DisplayFromAny>")]
-    pub(crate) aliases: Vec<String>,
+    pub aliases: Vec<String>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) ipv4_address: Option<String>,
+    pub ipv4_address: Option<String>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) ipv6_address: Option<String>,
+    pub ipv6_address: Option<String>,
 }
 
 impl Display for ServiceNetwork {
@@ -825,16 +825,16 @@ impl Display for ServiceNetwork {
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
-pub(crate) struct Port {
+pub struct Port {
     #[serde_as(as = "DisplayFromAny")]
-    pub(crate) target: String,
+    pub target: String,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) published: Option<String>,
+    pub published: Option<String>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) host_ip: Option<String>,
+    pub host_ip: Option<String>,
     #[serde_as(as = "DisplayFromAny")]
     #[serde(default = "default_protocol")]
-    pub(crate) protocol: String,
+    pub protocol: String,
 }
 
 fn default_protocol() -> String {
@@ -866,7 +866,7 @@ impl Display for Port {
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
-pub(crate) enum PullPolicy {
+pub enum PullPolicy {
     Always,
     Never,
     Missing,
@@ -881,7 +881,7 @@ impl Display for PullPolicy {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
-pub(crate) enum RestartPolicy {
+pub enum RestartPolicy {
     No,
     Always,
     OnFailure,
@@ -897,17 +897,17 @@ impl Display for RestartPolicy {
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
-pub(crate) struct FileReference {
+pub struct FileReference {
     #[serde_as(as = "DisplayFromAny")]
-    pub(crate) source: String,
+    pub source: String,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) target: Option<String>,
+    pub target: Option<String>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) uid: Option<String>,
+    pub uid: Option<String>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) gid: Option<String>,
+    pub gid: Option<String>,
     #[serde_as(as = "Option<PickFirst<(_, DisplayFromStr)>>")]
-    pub(crate) mode: Option<u32>,
+    pub mode: Option<u32>,
 }
 
 impl PartialEq for FileReference {
@@ -950,7 +950,7 @@ impl Display for FileReference {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(untagged)]
-pub(crate) enum ResourceLimit {
+pub enum ResourceLimit {
     Single(i32),
     Double { soft: i32, hard: i32 },
 }
@@ -967,15 +967,15 @@ impl Display for ResourceLimit {
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct ServiceVolume {
+pub struct ServiceVolume {
     #[serde(flatten)]
-    pub(crate) r#type: ServiceVolumeType,
+    pub r#type: ServiceVolumeType,
     #[serde_as(as = "DisplayFromAny")]
-    pub(crate) target: PathBuf,
-    pub(crate) read_only: Option<bool>,
-    pub(crate) volume: Option<ServiceVolumeVolume>,
-    pub(crate) bind: Option<ServiceVolumeBind>,
-    pub(crate) tmpfs: Option<ServiceVolumeTmpfs>,
+    pub target: PathBuf,
+    pub read_only: Option<bool>,
+    pub volume: Option<ServiceVolumeVolume>,
+    pub bind: Option<ServiceVolumeBind>,
+    pub tmpfs: Option<ServiceVolumeTmpfs>,
 }
 
 impl PartialEq for ServiceVolume {
@@ -1051,7 +1051,7 @@ impl Display for ServiceVolume {
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type", content = "source", rename_all = "lowercase")]
-pub(crate) enum ServiceVolumeType {
+pub enum ServiceVolumeType {
     Volume(#[serde_as(as = "Option<DisplayFromAny>")] Option<String>),
     Bind(#[serde_as(as = "PickFirst<(AbsPathBuf, DisplayFromAny)>")] PathBuf),
     Tmpfs,
@@ -1059,28 +1059,28 @@ pub(crate) enum ServiceVolumeType {
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct ServiceVolumeVolume {
-    pub(crate) nocopy: Option<bool>,
+pub struct ServiceVolumeVolume {
+    pub nocopy: Option<bool>,
 }
 
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Default, Debug)]
-pub(crate) struct ServiceVolumeBind {
+pub struct ServiceVolumeBind {
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) propagation: Option<String>,
-    pub(crate) create_host_path: Option<bool>,
+    pub propagation: Option<String>,
+    pub create_host_path: Option<bool>,
     #[serde_as(as = "Option<DisplayFromAny>")]
-    pub(crate) selinux: Option<String>,
+    pub selinux: Option<String>,
 }
 
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub(crate) struct ServiceVolumeTmpfs {
-    pub(crate) size: Option<Byte>,
+pub struct ServiceVolumeTmpfs {
+    pub size: Option<Byte>,
     #[serde_as(as = "Option<PickFirst<(_, DisplayFromStr)>>")]
-    pub(crate) mode: Option<u32>,
+    pub mode: Option<u32>,
 }
 
 #[skip_serializing_none]
@@ -1089,22 +1089,22 @@ pub(crate) struct ServiceVolumeTmpfs {
     IndexMap => #[serde(skip_serializing_if = "IndexMap::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub(crate) struct Network {
-    pub(crate) name: Option<String>,
-    pub(crate) driver: Option<String>,
-    pub(crate) driver_opts: IndexMap<String, String>,
-    pub(crate) enable_ipv6: Option<bool>,
-    pub(crate) ipam: Option<IpamConfig>,
-    pub(crate) internal: Option<bool>,
+pub struct Network {
+    pub name: Option<String>,
+    pub driver: Option<String>,
+    pub driver_opts: IndexMap<String, String>,
+    pub enable_ipv6: Option<bool>,
+    pub ipam: Option<IpamConfig>,
+    pub internal: Option<bool>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, DisplayFromAny>, MappingWithEqualsEmpty)>"
     )]
-    pub(crate) labels: IndexMap<String, String>,
-    pub(crate) external: Option<bool>,
+    pub labels: IndexMap<String, String>,
+    pub external: Option<bool>,
 }
 
 impl Network {
-    pub(crate) fn to_args(&self) -> Vec<String> {
+    pub fn to_args(&self) -> Vec<String> {
         let mut args = Vec::new();
 
         if !self.external.unwrap_or_default() {
@@ -1160,17 +1160,17 @@ impl Network {
     Vec => #[serde(skip_serializing_if = "Vec::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct IpamConfig {
-    pub(crate) driver: Option<String>,
-    pub(crate) config: Vec<IpamPool>,
+pub struct IpamConfig {
+    pub driver: Option<String>,
+    pub config: Vec<IpamPool>,
 }
 
 #[skip_serializing_none]
 #[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct IpamPool {
-    pub(crate) subnet: Option<String>,
-    pub(crate) ip_range: Option<String>,
-    pub(crate) gateway: Option<String>,
+pub struct IpamPool {
+    pub subnet: Option<String>,
+    pub ip_range: Option<String>,
+    pub gateway: Option<String>,
 }
 
 #[skip_serializing_none]
@@ -1179,19 +1179,19 @@ pub(crate) struct IpamPool {
     IndexMap => #[serde(skip_serializing_if = "IndexMap::is_empty", default)]
 )]
 #[derive(Serialize, Deserialize, Default, Debug)]
-pub(crate) struct Volume {
-    pub(crate) name: Option<String>,
-    pub(crate) driver: Option<String>,
-    pub(crate) driver_opts: IndexMap<String, String>,
-    pub(crate) external: Option<bool>,
+pub struct Volume {
+    pub name: Option<String>,
+    pub driver: Option<String>,
+    pub driver_opts: IndexMap<String, String>,
+    pub external: Option<bool>,
     #[serde_as(
         as = "PickFirst<(_, IndexMap<DisplayFromAny, DisplayFromAny>, MappingWithEqualsEmpty)>"
     )]
-    pub(crate) labels: IndexMap<String, String>,
+    pub labels: IndexMap<String, String>,
 }
 
 impl Volume {
-    pub(crate) fn to_args(&self) -> Vec<String> {
+    pub fn to_args(&self) -> Vec<String> {
         let mut args = Vec::new();
 
         if !self.external.unwrap_or_default() {
@@ -1217,16 +1217,16 @@ impl Volume {
 #[skip_serializing_none]
 #[serde_as]
 #[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct Secret {
-    pub(crate) name: Option<String>,
+pub struct Secret {
+    pub name: Option<String>,
     #[serde_as(as = "Option<AbsPathBuf>")]
-    pub(crate) file: Option<PathBuf>,
-    pub(crate) environment: Option<String>,
-    pub(crate) external: Option<bool>,
+    pub file: Option<PathBuf>,
+    pub environment: Option<String>,
+    pub external: Option<bool>,
 }
 
 impl Secret {
-    pub(crate) fn to_args(&self) -> Vec<String> {
+    pub fn to_args(&self) -> Vec<String> {
         let mut args = Vec::new();
 
         if !self.external.unwrap_or_default() {
@@ -1447,7 +1447,7 @@ serde_conv!(
     }
 );
 
-pub(crate) fn parse_port(port: &str) -> Result<Port, Infallible> {
+pub fn parse_port(port: &str) -> Result<Port, Infallible> {
     let mut parts = port.split(':').rev();
     let container_port = parts.next().unwrap();
     let mut container_parts = container_port.split('/');
@@ -1518,7 +1518,7 @@ serde_conv!(
     }
 );
 
-pub(crate) fn parse_service_volume(mount: &str) -> Result<ServiceVolume> {
+pub fn parse_service_volume(mount: &str) -> Result<ServiceVolume> {
     let mut r#type = ServiceVolumeType::Volume(None);
     let target;
     let mut read_only = None;
@@ -1633,20 +1633,21 @@ mod tests {
 
     #[test_resources("tests/fixtures/**/*.y*ml")]
     fn serde(resource: &str) {
-        let contents = fs::read_to_string(resource).unwrap();
+        let contents = fs::read_to_string(format!("../{}", resource)).unwrap();
 
         assert_matches!(serde_yaml::from_str::<Compose>(&contents), Ok(_));
     }
 
     #[test]
     fn merge() {
-        let base = fs::read_to_string("tests/fixtures/override/compose.yaml").unwrap();
-        let other = fs::read_to_string("tests/fixtures/override/compose.override.yaml").unwrap();
+        let base = fs::read_to_string("../tests/fixtures/override/compose.yaml").unwrap();
+        let other = fs::read_to_string("../tests/fixtures/override/compose.override.yaml").unwrap();
 
         let mut result = serde_yaml::from_str::<Compose>(&base).unwrap();
         result.merge(serde_yaml::from_str(&other).unwrap());
 
-        let expected = fs::read_to_string("tests/fixtures/override/compose.expected.yaml").unwrap();
+        let expected =
+            fs::read_to_string("../tests/fixtures/override/compose.expected.yaml").unwrap();
 
         assert_eq!(
             format!("{result:#?}"),

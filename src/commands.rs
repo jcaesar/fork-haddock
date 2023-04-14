@@ -41,7 +41,8 @@ pub(crate) async fn run(command: Command, config: Config) -> Result<()> {
     match command {
         Command::ExtCommand(command) => {
             let podman = Podman::new(&config).await?;
-            let file = compose::parse(&config, false)?;
+            let file =
+                compose::parse(&config.project_name, &config.files, &config.profiles, false)?;
 
             match command {
                 ExtCommand::Up(args) => up::run(args, &podman, &file, &config).await,

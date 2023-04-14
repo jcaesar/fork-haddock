@@ -1,9 +1,14 @@
-automod::dir!("src");
+mod commands;
+mod config;
+mod podman;
+mod progress;
+mod utils;
 
 use std::{env, path::PathBuf};
 
 use anyhow::Result;
 use clap::{ArgAction, Parser};
+pub(crate) use haddock_compose_parser as compose;
 use serde::{Deserialize, Serialize};
 use serde_with::{
     formats::CommaSeparator, serde_as, skip_serializing_none, PickFirst, StringWithSeparator,

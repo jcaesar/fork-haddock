@@ -1,11 +1,19 @@
-automod::dir!(pub(crate) "src/compose");
+#[path = "compose/parser.rs"]
+pub(crate) mod parser;
+#[path = "compose/types.rs"]
+pub mod types;
+#[path = "compose/utils.rs"]
+#[macro_use]
+mod utils;
 
 use std::{
     env::{self, VarError},
     fs,
     io::{self, Read},
+    path::PathBuf,
 };
 
+use crate::utils::{regex, STYLED_WARNING};
 use anyhow::{anyhow, bail, Context, Error, Result};
 use indexmap::IndexSet;
 use itertools::Itertools;
@@ -15,10 +23,6 @@ use serde_yaml::Value;
 use self::{
     parser::{State, Token, Var},
     types::{Compose, Condition, ServiceVolumeType},
-};
-use crate::{
-    config::Config,
-    utils::{regex, STYLED_WARNING},
 };
 
 fn evaluate(tokens: Vec<Token>) -> Result<String> {
@@ -78,11 +82,10 @@ fn evaluate(tokens: Vec<Token>) -> Result<String> {
                 })),
             },
         })
-        .collect::<Result<Vec<_>, _>>()
-        .map(|tokens| tokens.join(""))
+        .collect::<Result<String, _>>()
 }
 
-fn interpolate(value: &Value) -> Result<Value> {
+pub fn interpolate(value: &Value) -> Result<Value> {
     if let Some(value) = value.as_str() {
         parser::parse(value).and_then(evaluate).map(Value::String)
     } else if let Some(values) = value.as_sequence() {
@@ -102,9 +105,13 @@ fn interpolate(value: &Value) -> Result<Value> {
     }
 }
 
-pub(crate) fn parse(config: &Config, no_interpolate: bool) -> Result<Compose> {
-    let contents = config
-        .files
+pub fn parse(
+    project_name: &Option<String>,
+    files: &Vec<PathBuf>,
+    profiles: &Vec<String>,
+    no_interpolate: bool,
+) -> Result<Compose> {
+    let contents = files
         .iter()
         .map(|path| {
             if path.as_os_str() == "-" {
@@ -129,8 +136,8 @@ pub(crate) fn parse(config: &Config, no_interpolate: bool) -> Result<Compose> {
                 .map_err(Error::from)
                 .map(|mut content: Value| {
                     if let Some(values) = content.as_mapping_mut() {
-                        let name = if config.project_name.is_some() {
-                            config.project_name.clone()
+                        let name = if project_name.is_some() {
+                            project_name.clone()
                         } else if let Some((_, n)) =
                             values.into_iter().find(|(key, _)| *key == "name")
                         {
@@ -235,7 +242,7 @@ pub(crate) fn parse(config: &Config, no_interpolate: bool) -> Result<Compose> {
         }
 
         for profile in &service.profiles {
-            if config.profiles.contains(profile) {
+            if profiles.contains(profile) {
                 return true;
             }
         }
@@ -501,12 +508,15 @@ mod tests {
 
     #[test_resources("tests/fixtures/**/*.y*ml")]
     fn parse(resource: &str) {
-        let config = Config {
-            files: vec![PathBuf::from(resource)],
-            ..Config::default()
-        };
-
-        assert_matches!(super::parse(&config, false), Ok(_));
+        assert_matches!(
+            super::parse(
+                &None,
+                &vec![PathBuf::from(format!("../{}", resource))],
+                &vec![],
+                false
+            ),
+            Ok(_)
+        );
     }
 
     #[test]
